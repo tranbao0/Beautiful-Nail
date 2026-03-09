@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Available Slots – Beautiful Nail</title></head>
+<body>
+<nav><a href="/">Home</a> | <strong>View Slots</strong></nav>
+<h1>Available Time Slots</h1>
+<form method="get" action="/slots">
+  <label>Date: <input type="date" name="date" th:value="${selectedDate}"></label>
+  <button type="submit">Filter</button>
+</form>
+<table border="1" cellpadding="8">
+  <tr><th>Slot ID</th><th>Stylist ID</th><th>Start</th><th>End</th><th></th></tr>
+  <tr th:each="slot : ${slots}">
+    <td th:text="${slot.slotId}"></td>
+    <td th:text="${slot.stylistId}"></td>
+    <td th:text="${slot.startTime}"></td>
+    <td th:text="${slot.endTime}"></td>
+    <td><a th:href="@{/appointments/book(slotId=${slot.slotId})}">Book</a></td>
+  </tr>
+  <tr th:if="${#lists.isEmpty(slots)}"><td colspan="5">No available slots for this date.</td></tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Services – Beautiful Nail</title></head>
+<body>
+<nav><a href="/">Home</a> | <strong>Services</strong></nav>
+<h1>Our Services</h1>
+<table border="1" cellpadding="8">
+  <tr><th>Service</th><th>Duration (min)</th><th>Min Price</th><th>Max Price</th></tr>
+  <tr th:each="svc : ${services}">
+    <td th:text="${svc.name}"></td>
+    <td th:text="${svc.estDuration}"></td>
+    <td th:text="'$' + ${svc.priceMin}"></td>
+    <td th:text="'$' + ${svc.priceMax}"></td>
+  </tr>
+</table>
+</body>
+</html>

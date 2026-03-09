@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Receptionist Dashboard – Beautiful Nail</title></head>
+<body>
+<nav><a href="/">Home</a> | <strong>Receptionist Dashboard</strong></nav>
+<h1>Receptionist Dashboard</h1>
+
+<h2>All Appointments</h2>
+<table border="1" cellpadding="8">
+  <tr><th>ID</th><th>User ID</th><th>Stylist ID</th><th>Start</th><th>Status</th></tr>
+  <tr th:each="apmt : ${appointments}">
+    <td th:text="${apmt.apmtId}"></td>
+    <td th:text="${apmt.userId}"></td>
+    <td th:text="${apmt.stylistId}"></td>
+    <td th:text="${apmt.startTime}"></td>
+    <td th:text="${apmt.status}"></td>
+  </tr>
+</table>
+
+<hr>
+<h2>Add Service</h2>
+<form method="post" action="/receptionist/services/add">
+  <label>Name: <input type="text" name="name" required></label><br>
+  <label>Min Price: <input type="number" step="0.01" name="priceMin" required></label><br>
+  <label>Max Price: <input type="number" step="0.01" name="priceMax" required></label><br>
+  <label>Duration (min): <input type="number" name="estDuration" required></label><br><br>
+  <button type="submit">Add Service</button>
+</form>
+
+<hr>
+<h2>Services</h2>
+<table border="1" cellpadding="8">
+  <tr><th>Name</th><th>Duration</th><th>Price</th><th></th></tr>
+  <tr th:each="svc : ${services}">
+    <td th:text="${svc.name}"></td>
+    <td th:text="${svc.estDuration}"></td>
+    <td th:text="'$' + ${svc.priceMin} + '–$' + ${svc.priceMax}"></td>
+    <td>
+      <form th:action="@{/receptionist/services/{id}/delete(id=${svc.serviceId})}" method="post">
+        <button type="submit">Delete</button>
+      </form>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

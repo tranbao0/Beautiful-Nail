@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Beautiful Nail – Home</title></head>
+<body>
+<nav>
+  <strong>Beautiful Nail</strong> |
+  <a href="/services">Services</a> |
+  <a href="/slots">View Availability</a>
+</nav>
+
+<h1>Book Your Nail Appointment Online</h1>
+<p>Browse services, choose a stylist, and pick a time — no phone call needed.</p>
+<a href="/slots"><button>Book an Appointment</button></a>
+
+<h2>Our Services</h2>
+<table border="1" cellpadding="8">
+  <tr><th>Service</th><th>Duration (min)</th><th>Price Range</th><th></th></tr>
+  <tr th:each="svc : ${services}">
+    <td th:text="${svc.name}"></td>
+    <td th:text="${svc.estDuration}"></td>
+    <td th:text="'$' + ${svc.priceMin} + ' – $' + ${svc.priceMax}"></td>
+    <td><a href="/slots">Book</a></td>
+  </tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Book Appointment – Beautiful Nail</title></head>
+<body>
+<nav><a href="/">Home</a> | <a href="/slots">Slots</a> | <strong>Book</strong></nav>
+<h1>Book an Appointment</h1>
+<h3>Selected Slot</h3>
+<p>Start: <strong th:text="${slot.startTime}"></strong></p>
+<p>End: <strong th:text="${slot.endTime}"></strong></p>
+<form method="post" action="/appointments/book" th:object="${appointment}">
+  <input type="hidden" name="slotId" th:value="${slot.slotId}">
+  <label>Select Service:<br>
+    <select name="serviceId">
+      <option th:each="svc : ${services}" th:value="${svc.serviceId}"
+              th:text="${svc.name} + ' ($' + ${svc.priceMin} + '–$' + ${svc.priceMax} + ')'"></option>
+    </select>
+  </label><br><br>
+  <label>Notes:<br>
+    <textarea name="notes" rows="3" cols="40" placeholder="Any special requests..."></textarea>
+  </label><br><br>
+  <button type="submit">Confirm Booking</button>
+  <a href="/slots">Cancel</a>
+</form>
+</body>
+</html>

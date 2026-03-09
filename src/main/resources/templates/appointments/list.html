@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>My Appointments – Beautiful Nail</title></head>
+<body>
+<nav><a href="/">Home</a> | <strong>My Appointments</strong></nav>
+<h1>My Appointments</h1>
+<table border="1" cellpadding="8">
+  <tr><th>ID</th><th>Start</th><th>End</th><th>Status</th><th>Notes</th><th></th></tr>
+  <tr th:each="apmt : ${appointments}">
+    <td th:text="${apmt.apmtId}"></td>
+    <td th:text="${apmt.startTime}"></td>
+    <td th:text="${apmt.endTime}"></td>
+    <td th:text="${apmt.status}"></td>
+    <td th:text="${apmt.notes}"></td>
+    <td>
+      <form th:action="@{/appointments/{id}/cancel(id=${apmt.apmtId})}" method="post">
+        <input type="hidden" name="slotId" value="0">
+        <button type="submit">Cancel</button>
+      </form>
+    </td>
+  </tr>
+  <tr th:if="${#lists.isEmpty(appointments)}"><td colspan="6">No appointments found.</td></tr>
+</table>
+</body>
+</html>
