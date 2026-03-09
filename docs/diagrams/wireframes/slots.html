@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Wireframe – View Slots | Beautiful Nail</title>
+  <style>
+    body { font-family: sans-serif; margin: 0; background: #fff; color: #000; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 12px 24px; border-bottom: 2px solid #000; }
+    nav .links a { margin-left: 16px; text-decoration: none; color: #000; }
+    .btn { display: inline-block; padding: 8px 20px; border: 2px solid #000; cursor: pointer; text-decoration: none; color: #000; font-size: 13px; }
+    .btn.filled { background: #000; color: #fff; }
+    .layout { display: grid; grid-template-columns: 240px 1fr; gap: 0; min-height: calc(100vh - 120px); }
+    .filters { border-right: 1px solid #000; padding: 24px; }
+    .filters h3 { font-size: 14px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+    .filter-group { margin-bottom: 20px; }
+    .filter-group label { display: block; font-size: 13px; margin-bottom: 6px; font-weight: bold; }
+    .filter-group select, .filter-group input { width: 100%; padding: 6px; border: 1px solid #000; font-size: 13px; }
+    .filter-group .option { padding: 6px 8px; border: 1px solid #ccc; margin-bottom: 4px; font-size: 13px; cursor: pointer; }
+    .filter-group .option.selected { border-color: #000; font-weight: bold; background: #f0f0f0; }
+    .main { padding: 24px; }
+    .main-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .main-header h2 { font-size: 20px; }
+    .results-count { font-size: 13px; color: #555; }
+    .stylist-row { border: 1px solid #000; margin-bottom: 16px; }
+    .stylist-header { display: flex; align-items: center; gap: 16px; padding: 12px 16px; border-bottom: 1px solid #ccc; background: #f9f9f9; }
+    .stylist-avatar { width: 40px; height: 40px; border: 1px solid #000; background: #e0e0e0; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #555; flex-shrink: 0; }
+    .stylist-info strong { display: block; font-size: 14px; }
+    .stylist-info span { font-size: 12px; color: #555; }
+    .slots-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; padding: 12px 16px; }
+    .slot { border: 1px solid #000; padding: 8px; text-align: center; font-size: 12px; cursor: pointer; }
+    .slot.available { background: #fff; }
+    .slot.unavailable { background: #f0f0f0; color: #999; border-color: #ccc; cursor: default; text-decoration: line-through; }
+    .slot:hover:not(.unavailable) { background: #000; color: #fff; }
+    .date-nav { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .date-nav button { padding: 6px 12px; border: 1px solid #000; background: #fff; cursor: pointer; font-size: 13px; }
+    .date-nav strong { font-size: 15px; }
+    footer { border-top: 2px solid #000; padding: 12px 24px; font-size: 12px; color: #555; }
+    .page-nav { text-align: center; padding: 16px; background: #f5f5f5; border-top: 1px solid #ccc; }
+    .page-nav a { margin: 0 8px; text-decoration: none; color: #000; font-size: 13px; }
+    .page-nav a.current { font-weight: bold; text-decoration: underline; }
+    .legend { display: flex; gap: 16px; font-size: 12px; color: #555; margin-bottom: 16px; }
+    .legend span { display: flex; align-items: center; gap: 6px; }
+    .legend-box { width: 14px; height: 14px; border: 1px solid #000; display: inline-block; }
+    .legend-box.un { background: #f0f0f0; border-color: #ccc; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <strong>Beautiful Nail</strong>
+  <div class="links">
+    <a href="index.html">Home</a>
+    <a href="#">Services</a>
+    <a href="#">Log In</a>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <!-- FILTERS SIDEBAR -->
+  <div class="filters">
+    <h3>Filters</h3>
+
+    <div class="filter-group">
+      <label>Service</label>
+      <select>
+        <option>All Services</option>
+        <option>Classic Manicure</option>
+        <option>Gel Manicure</option>
+        <option>Classic Pedicure</option>
+        <option>Acrylic Full Set</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Stylist</label>
+      <div class="option selected">Any Stylist</div>
+      <div class="option">Jenny L.</div>
+      <div class="option">Mia T.</div>
+      <div class="option">Sara K.</div>
+    </div>
+
+    <div class="filter-group">
+      <label>Date</label>
+      <input type="date" value="2026-03-10">
+    </div>
+
+    <button class="btn filled" style="width:100%;text-align:center;">Apply Filters</button>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+    <div class="main-header">
+      <h2>Available Time Slots</h2>
+      <span class="results-count">Showing results for: Tue, Mar 10 2026</span>
+    </div>
+
+    <div class="date-nav">
+      <button>&larr; Prev</button>
+      <strong>Tuesday, March 10, 2026</strong>
+      <button>Next &rarr;</button>
+    </div>
+
+    <div class="legend">
+      <span><span class="legend-box"></span> Available</span>
+      <span><span class="legend-box un"></span> Unavailable</span>
+    </div>
+
+    <!-- Stylist 1 -->
+    <div class="stylist-row">
+      <div class="stylist-header">
+        <div class="stylist-avatar">Photo</div>
+        <div class="stylist-info">
+          <strong>Jenny L.</strong>
+          <span>Specialty: Gel, Acrylics</span>
+        </div>
+      </div>
+      <div class="slots-grid">
+        <div class="slot unavailable">9:00 AM</div>
+        <div class="slot unavailable">9:30 AM</div>
+        <a href="book.html" style="text-decoration:none;"><div class="slot available">10:00 AM</div></a>
+        <a href="book.html" style="text-decoration:none;"><div class="slot available">10:30 AM</div></a>
+        <a href="book.html" style="text-decoration:none;"><div class="slot available">11:00 AM</div></a>
+        <div class="slot unavailable">11:30 AM</div>
+        <div class="slot unavailable">12:00 PM</div>
+        <a href="book.html" style="text-decoration:none;"><div class="slot available">1:00 PM</div></a>
+        <a href="book.html" style="text-decoration:none;"><div class="slot available">1:30 PM</div></a>
+        <a href="book.html" style="text-decoration:none;"><div class="slot available">2:00 PM</div></a>
+        <div class="slot unavailable">2:30 PM</div>
+        <a href="book.html" style="text-decoration:none;"><div class="slot available">3:00 PM</div></a>
+      </div>
+    </div>
+
+    <!-- Stylist 2 -->
+    <div class="stylist-row">
+      <div class="stylist-header">
+        <div class="stylist-avatar">Photo</div>
+        <div class="stylist-info">
+          <strong>Mia T.</strong>
+          <span>Specialty: Manicure, Pedicure</span>
+        </div>
+      </div>
+      <div class="slots-grid">
+        <a href="book.html" style="text-decoration:none;"><div class="slot available">9:00 AM</div></a>
+        <a href="book.html" style="text-decoration:none;"><div class="slot available">9:30 AM</div></a>
+        <div class="slot unavailable">10:00 AM</div>
+        <div class="slot unavailable">10:30 AM</div>
+        <a href="book.html" style="text-decoration:none;"><div class="slot available">11:00 AM</div></a>
+        <a href="book.html" style="text-decoration:none;"><div class="slot available">11:30 AM</div></a>
+        <div class="slot unavailable">12:00 PM</div>
+        <div class="slot unavailable">1:00 PM</div>
+        <a href="book.html" style="text-decoration:none;"><div class="slot available">1:30 PM</div></a>
+        <div class="slot unavailable">2:00 PM</div>
+        <a href="book.html" style="text-decoration:none;"><div class="slot available">2:30 PM</div></a>
+        <a href="book.html" style="text-decoration:none;"><div class="slot available">3:00 PM</div></a>
+      </div>
+    </div>
+
+    <!-- Stylist 3 -->
+    <div class="stylist-row">
+      <div class="stylist-header">
+        <div class="stylist-avatar">Photo</div>
+        <div class="stylist-info">
+          <strong>Sara K.</strong>
+          <span>Specialty: Nail Art, Pedicure</span>
+        </div>
+      </div>
+      <div class="slots-grid">
+        <div class="slot unavailable">9:00 AM</div>
+        <a href="book.html" style="text-decoration:none;"><div class="slot available">9:30 AM</div></a>
+        <a href="book.html" style="text-decoration:none;"><div class="slot available">10:00 AM</div></a>
+        <div class="slot unavailable">10:30 AM</div>
+        <div class="slot unavailable">11:00 AM</div>
+        <div class="slot unavailable">11:30 AM</div>
+        <a href="book.html" style="text-decoration:none;"><div class="slot available">12:00 PM</div></a>
+        <a href="book.html" style="text-decoration:none;"><div class="slot available">1:00 PM</div></a>
+        <div class="slot unavailable">1:30 PM</div>
+        <a href="book.html" style="text-decoration:none;"><div class="slot available">2:00 PM</div></a>
+        <a href="book.html" style="text-decoration:none;"><div class="slot available">2:30 PM</div></a>
+        <div class="slot unavailable">3:00 PM</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>&copy; 2026 Beautiful Nail</footer>
+
+<div class="page-nav">
+  <a href="index.html">[1] Home</a>
+  <a href="slots.html" class="current">[2] View Slots</a>
+  <a href="book.html">[3] Book Appointment</a>
+  <a href="confirmation.html">[4] Confirmation</a>
+</div>
+
+</body>
+</html>
