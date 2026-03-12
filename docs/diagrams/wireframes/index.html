@@ -1,116 +1,185 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Wireframe – Home | Beautiful Nail</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beautiful Nail – Home</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
   <style>
-    body { font-family: sans-serif; margin: 0; background: #fff; color: #000; }
-    nav { display: flex; justify-content: space-between; align-items: center; padding: 12px 24px; border-bottom: 2px solid #000; }
-    nav .links a { margin-left: 16px; text-decoration: none; color: #000; }
-    .hero { border: 1px dashed #999; margin: 24px; padding: 48px 24px; text-align: center; }
-    .hero h1 { font-size: 32px; margin-bottom: 8px; }
-    .hero p { color: #555; margin-bottom: 16px; }
-    .btn { display: inline-block; padding: 10px 24px; border: 2px solid #000; margin: 4px; cursor: pointer; text-decoration: none; color: #000; }
-    .btn.filled { background: #000; color: #fff; }
-    section { margin: 24px; }
-    h2 { font-size: 20px; border-bottom: 1px solid #000; padding-bottom: 6px; margin-bottom: 16px; }
-    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-    .card { border: 1px solid #000; padding: 16px; }
-    .card p { font-size: 13px; color: #555; margin: 4px 0; }
-    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-    .step { border: 1px dashed #999; padding: 16px; }
-    .step .num { font-size: 32px; font-weight: bold; color: #ccc; }
-    footer { border-top: 2px solid #000; padding: 12px 24px; font-size: 12px; color: #555; margin-top: 24px; }
-    .page-nav { text-align: center; padding: 16px; background: #f5f5f5; border-top: 1px solid #ccc; }
-    .page-nav a { margin: 0 8px; text-decoration: none; color: #000; font-size: 13px; }
-    .page-nav a.current { font-weight: bold; text-decoration: underline; }
+    .hero {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 80px 40px;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--rose);
+      margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 56px;
+      font-weight: 500;
+      line-height: 1.15;
+      margin-bottom: 16px;
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero p {
+      color: var(--gray);
+      font-size: 15px;
+      max-width: 440px;
+      margin: 0 auto 32px;
+      line-height: 1.7;
+    }
+    .hero-actions { display: flex; gap: 12px; justify-content: center; }
+
+    /* Services */
+    .services-section { padding: 60px 40px; }
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--rose);
+      margin-bottom: 12px;
+    }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      border: 1px solid var(--border);
+      background: var(--border);
+      margin-top: 28px;
+    }
+    .service-card {
+      background: var(--card-bg);
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .service-card h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      font-weight: 500;
+    }
+    .service-card .meta {
+      font-size: 12px;
+      color: var(--gray);
+    }
+    .service-card .price {
+      font-size: 13px;
+      color: var(--rose-dark);
+      font-weight: 500;
+    }
+    .service-card .book-link {
+      margin-top: auto;
+      padding-top: 16px;
+    }
+
+    /* How it works */
+    .how-section {
+      background: var(--white);
+      padding: 60px 40px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px;
+      margin-top: 40px;
+    }
+    .step-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 64px;
+      font-weight: 400;
+      color: var(--border);
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+    .step h3 {
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      margin-bottom: 8px;
+    }
+    .step p { font-size: 13px; color: var(--gray); line-height: 1.7; }
   </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
-  <strong>Beautiful Nail</strong>
-  <div class="links">
-    <a href="#">Services</a>
-    <a href="slots.html">Availability</a>
-    <a href="#">About</a>
-    <a href="#">Log In</a>
-    <a href="#" class="btn filled" style="padding:6px 14px;">Sign Up</a>
+  <a href="/" class="nav-brand">Beautiful Nail</a>
+  <div class="nav-links">
+    <a href="/services">Services</a>
+    <a href="/slots">Availability</a>
+    <a href="/appointments" class="btn btn-sm">My Appointments</a>
   </div>
 </nav>
 
 <!-- HERO -->
 <div class="hero">
+  <div class="hero-eyebrow">Online Booking Now Available</div>
   <h1>Book Your Nail Appointment Online</h1>
   <p>Browse services, choose a stylist, and pick a time — no phone call needed.</p>
-  <a href="slots.html" class="btn filled">Book an Appointment</a>
-  <a href="#" class="btn">View Services</a>
+  <div class="hero-actions">
+    <a href="/slots" class="btn btn-filled">Book an Appointment</a>
+    <a href="/services" class="btn">View Services</a>
+  </div>
 </div>
 
 <!-- SERVICES -->
-<section>
-  <h2>Our Services</h2>
-  <div class="grid">
-    <div class="card">
-      <strong>Classic Manicure</strong>
-      <p>45 min</p>
-      <p>$25 – $35</p>
-      <br><a href="book.html" class="btn" style="font-size:12px;padding:6px 12px;">Book</a>
+<section class="services-section">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-label">What We Offer</div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+      <h2 class="page-title" style="margin-bottom:0;">Our Services</h2>
+      <a href="/services" style="font-size:12px;color:var(--gray);text-decoration:none;letter-spacing:0.04em;">View all →</a>
     </div>
-    <div class="card">
-      <strong>Gel Manicure</strong>
-      <p>60 min</p>
-      <p>$40 – $55</p>
-      <br><a href="book.html" class="btn" style="font-size:12px;padding:6px 12px;">Book</a>
-    </div>
-    <div class="card">
-      <strong>Classic Pedicure</strong>
-      <p>50 min</p>
-      <p>$35 – $45</p>
-      <br><a href="book.html" class="btn" style="font-size:12px;padding:6px 12px;">Book</a>
-    </div>
-    <div class="card">
-      <strong>Acrylic Full Set</strong>
-      <p>90 min</p>
-      <p>$55 – $75</p>
-      <br><a href="book.html" class="btn" style="font-size:12px;padding:6px 12px;">Book</a>
+    <div class="services-grid">
+      <div th:each="svc : ${services}" class="service-card">
+        <h3 th:text="${svc.name}">Service Name</h3>
+        <div class="meta" th:text="${svc.estDuration} + ' min'">45 min</div>
+        <div class="price" th:text="'$' + ${svc.priceMin} + ' – $' + ${svc.priceMax}">$25 – $35</div>
+        <div class="book-link">
+          <a href="/slots" class="btn btn-sm">Book</a>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- HOW IT WORKS -->
-<section>
-  <h2>How It Works</h2>
-  <div class="steps">
-    <div class="step">
-      <div class="num">1</div>
-      <strong>Browse Services</strong>
-      <p>View all available services and pricing upfront.</p>
-    </div>
-    <div class="step">
-      <div class="num">2</div>
-      <strong>Pick a Stylist & Time</strong>
-      <p>Select your preferred stylist and an open time slot.</p>
-    </div>
-    <div class="step">
-      <div class="num">3</div>
-      <strong>Confirm Booking</strong>
-      <p>Submit and receive a confirmation instantly.</p>
+<section class="how-section">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-label">Simple Process</div>
+    <h2 class="page-title" style="margin-bottom:0;">How It Works</h2>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>Browse Services</h3>
+        <p>View all available services and pricing upfront — no surprises.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>Pick a Stylist & Time</h3>
+        <p>Select your preferred stylist and choose from available time slots.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>Confirm Booking</h3>
+        <p>Submit your details and receive a confirmation instantly.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<footer>
-  &copy; 2026 Beautiful Nail &nbsp;|&nbsp; All rights reserved
-</footer>
-
-<div class="page-nav">
-  <a href="index.html" class="current">[1] Home</a>
-  <a href="slots.html">[2] View Slots</a>
-  <a href="book.html">[3] Book Appointment</a>
-  <a href="confirmation.html">[4] Confirmation</a>
-</div>
+<footer>&copy; 2026 Beautiful Nail &nbsp;·&nbsp; All rights reserved</footer>
 
 </body>
 </html>

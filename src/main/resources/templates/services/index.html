@@ -1,17 +1,66 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head><meta charset="UTF-8"><title>Services – Beautiful Nail</title></head>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Services – Beautiful Nail</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <style>
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      border: 1px solid var(--border);
+      background: var(--border);
+      margin-top: 8px;
+    }
+    .svc-card {
+      background: var(--card-bg);
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .svc-card h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px;
+      font-weight: 500;
+    }
+    .svc-card .meta { font-size: 12px; color: var(--gray); }
+    .svc-card .price { font-size: 14px; color: var(--rose-dark); font-weight: 500; margin-top: 4px; }
+    .svc-card .book-btn { margin-top: auto; padding-top: 20px; }
+  </style>
+</head>
 <body>
-<nav><a href="/">Home</a> | <strong>Services</strong></nav>
-<h1>Our Services</h1>
-<table border="1" cellpadding="8">
-  <tr><th>Service</th><th>Duration (min)</th><th>Min Price</th><th>Max Price</th></tr>
-  <tr th:each="svc : ${services}">
-    <td th:text="${svc.name}"></td>
-    <td th:text="${svc.estDuration}"></td>
-    <td th:text="'$' + ${svc.priceMin}"></td>
-    <td th:text="'$' + ${svc.priceMax}"></td>
-  </tr>
-</table>
+
+<nav>
+  <a href="/" class="nav-brand">Beautiful Nail</a>
+  <div class="nav-links">
+    <a href="/services" style="color:var(--black);">Services</a>
+    <a href="/slots">Availability</a>
+    <a href="/appointments" class="btn btn-sm">My Appointments</a>
+  </div>
+</nav>
+
+<div class="page-wrap-wide">
+  <div class="breadcrumb">
+    <a href="/">Home</a><span>›</span>Services
+  </div>
+  <h1 class="page-title">Our Services</h1>
+
+  <div class="services-grid">
+    <div th:each="svc : ${services}" class="svc-card">
+      <h3 th:text="${svc.name}">Classic Manicure</h3>
+      <div class="meta" th:text="${svc.estDuration} + ' min'">45 min</div>
+      <div class="price" th:text="'$' + ${svc.priceMin} + ' – $' + ${svc.priceMax}">$25 – $35</div>
+      <div class="book-btn">
+        <a href="/slots" class="btn btn-sm">Book Now</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>&copy; 2026 Beautiful Nail &nbsp;·&nbsp; All rights reserved</footer>
+
 </body>
 </html>

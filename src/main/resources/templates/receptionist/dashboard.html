@@ -1,46 +1,200 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head><meta charset="UTF-8"><title>Receptionist Dashboard – Beautiful Nail</title></head>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Receptionist Dashboard – Beautiful Nail</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <style>
+    .dashboard-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 28px;
+    }
+    .panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+    }
+    .panel-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--cream);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .panel-header h2 {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .panel-body { padding: 24px; }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-bottom: 28px;
+    }
+    .stat {
+      background: var(--white);
+      padding: 20px 24px;
+    }
+    .stat-val {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 36px;
+      font-weight: 500;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-label { font-size: 11px; color: var(--gray); letter-spacing: 0.06em; text-transform: uppercase; }
+
+    .add-form .form-group { margin-bottom: 12px; }
+    .add-form .form-grid { grid-template-columns: 1fr 1fr; }
+
+    /* Sidebar panels */
+    .sidebar-panels { display: flex; flex-direction: column; gap: 28px; }
+  </style>
+</head>
 <body>
-<nav><a href="/">Home</a> | <strong>Receptionist Dashboard</strong></nav>
-<h1>Receptionist Dashboard</h1>
 
-<h2>All Appointments</h2>
-<table border="1" cellpadding="8">
-  <tr><th>ID</th><th>User ID</th><th>Stylist ID</th><th>Start</th><th>Status</th></tr>
-  <tr th:each="apmt : ${appointments}">
-    <td th:text="${apmt.apmtId}"></td>
-    <td th:text="${apmt.userId}"></td>
-    <td th:text="${apmt.stylistId}"></td>
-    <td th:text="${apmt.startTime}"></td>
-    <td th:text="${apmt.status}"></td>
-  </tr>
-</table>
+<nav>
+  <a href="/" class="nav-brand">Beautiful Nail</a>
+  <div class="nav-links">
+    <a href="/services">Services</a>
+    <a href="/slots">Slots</a>
+    <a href="/receptionist" style="color:var(--black);">Dashboard</a>
+  </div>
+</nav>
 
-<hr>
-<h2>Add Service</h2>
-<form method="post" action="/receptionist/services/add">
-  <label>Name: <input type="text" name="name" required></label><br>
-  <label>Min Price: <input type="number" step="0.01" name="priceMin" required></label><br>
-  <label>Max Price: <input type="number" step="0.01" name="priceMax" required></label><br>
-  <label>Duration (min): <input type="number" name="estDuration" required></label><br><br>
-  <button type="submit">Add Service</button>
-</form>
+<div class="page-wrap-wide">
+  <h1 class="page-title">Receptionist Dashboard</h1>
 
-<hr>
-<h2>Services</h2>
-<table border="1" cellpadding="8">
-  <tr><th>Name</th><th>Duration</th><th>Price</th><th></th></tr>
-  <tr th:each="svc : ${services}">
-    <td th:text="${svc.name}"></td>
-    <td th:text="${svc.estDuration}"></td>
-    <td th:text="'$' + ${svc.priceMin} + '–$' + ${svc.priceMax}"></td>
-    <td>
-      <form th:action="@{/receptionist/services/{id}/delete(id=${svc.serviceId})}" method="post">
-        <button type="submit">Delete</button>
-      </form>
-    </td>
-  </tr>
-</table>
+  <!-- STATS -->
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-val" th:text="${#lists.size(appointments)}">0</div>
+      <div class="stat-label">Total Appointments</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" th:text="${#lists.size(services)}">0</div>
+      <div class="stat-label">Active Services</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">3</div>
+      <div class="stat-label">Stylists</div>
+    </div>
+  </div>
+
+  <div class="dashboard-layout">
+
+    <!-- MAIN: Appointments -->
+    <div>
+      <div class="panel">
+        <div class="panel-header">
+          <h2>All Appointments</h2>
+        </div>
+        <div th:if="${!#lists.isEmpty(appointments)}">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>User ID</th>
+                <th>Stylist ID</th>
+                <th>Start</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="apmt : ${appointments}">
+                <td th:text="${apmt.apmtId}">1</td>
+                <td th:text="${apmt.userId}">1</td>
+                <td th:text="${apmt.stylistId}">1</td>
+                <td th:text="${apmt.startTime}">–</td>
+                <td>
+                  <span class="badge"
+                    th:classappend="${apmt.status == 'booked'} ? 'badge-booked' : (${apmt.status == 'cancelled'} ? 'badge-cancelled' : 'badge-completed')"
+                    th:text="${apmt.status}">booked</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div th:if="${#lists.isEmpty(appointments)}" style="padding:32px;text-align:center;color:var(--gray);font-size:13px;">
+          No appointments yet.
+        </div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar-panels">
+
+      <!-- Add Service -->
+      <div class="panel">
+        <div class="panel-header"><h2>Add Service</h2></div>
+        <div class="panel-body">
+          <form method="post" action="/receptionist/services/add" class="add-form">
+            <div class="form-group">
+              <label>Service Name</label>
+              <input type="text" name="name" placeholder="Gel Manicure" required>
+            </div>
+            <div class="form-grid form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div class="form-group">
+                <label>Min Price</label>
+                <input type="number" step="0.01" name="priceMin" placeholder="25.00" required>
+              </div>
+              <div class="form-group">
+                <label>Max Price</label>
+                <input type="number" step="0.01" name="priceMax" placeholder="35.00" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Duration (min)</label>
+              <input type="number" name="estDuration" placeholder="45" required>
+            </div>
+            <button type="submit" class="btn btn-filled" style="width:100%;text-align:center;">Add Service</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Services list -->
+      <div class="panel">
+        <div class="panel-header"><h2>Services</h2></div>
+        <div th:if="${!#lists.isEmpty(services)}">
+          <table class="data-table">
+            <thead>
+              <tr><th>Name</th><th>Price</th><th></th></tr>
+            </thead>
+            <tbody>
+              <tr th:each="svc : ${services}">
+                <td>
+                  <div style="font-weight:500;font-size:13px;" th:text="${svc.name}">Classic Manicure</div>
+                  <div style="font-size:11px;color:var(--gray);" th:text="${svc.estDuration} + ' min'">45 min</div>
+                </td>
+                <td th:text="'$' + ${svc.priceMin} + '–$' + ${svc.priceMax}" style="font-size:12px;color:var(--rose-dark);">$25</td>
+                <td>
+                  <form th:action="@{/receptionist/services/{id}/delete(id=${svc.serviceId})}" method="post"
+                        onsubmit="return confirm('Delete this service?')">
+                    <button type="submit" class="btn btn-sm btn-danger">Del</button>
+                  </form>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div th:if="${#lists.isEmpty(services)}" style="padding:20px;text-align:center;font-size:13px;color:var(--gray);">
+          No services yet.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer>&copy; 2026 Beautiful Nail &nbsp;·&nbsp; All rights reserved</footer>
+
 </body>
 </html>

@@ -1,25 +1,224 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head><meta charset="UTF-8"><title>Book Appointment – Beautiful Nail</title></head>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Appointment – Beautiful Nail</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <style>
+    body { background: var(--cream); }
+
+    /* Progress */
+    .progress-bar {
+      display: flex;
+      align-items: center;
+      margin-bottom: 36px;
+    }
+    .step-item { display: flex; align-items: center; gap: 10px; }
+    .step-circle {
+      width: 28px; height: 28px;
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      font-weight: 500;
+      background: var(--white);
+      flex-shrink: 0;
+    }
+    .step-circle.done { background: var(--black); color: var(--white); border-color: var(--black); }
+    .step-circle.active { background: var(--rose); color: var(--white); border-color: var(--rose); }
+    .step-circle.inactive { color: var(--border); border-color: var(--border); }
+    .step-label { font-size: 12px; color: var(--gray); letter-spacing: 0.03em; }
+    .step-label.active { color: var(--black); font-weight: 500; }
+    .step-label.inactive { color: var(--border); }
+    .step-line { flex: 1; height: 1px; background: var(--border); margin: 0 12px; }
+    .step-line.done { background: var(--black); }
+
+    /* Summary bar */
+    .summary-bar {
+      background: var(--white);
+      border: 1px solid var(--border);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      margin-bottom: 28px;
+      font-size: 13px;
+    }
+    .summary-bar .item span { font-size: 11px; color: var(--gray); letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 2px; }
+    .summary-bar .item strong { font-weight: 500; }
+    .summary-bar .change-link {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--gray);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border);
+    }
+    .summary-bar .change-link:hover { color: var(--black); border-color: var(--black); }
+
+    /* Form layout */
+    .form-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 32px;
+    }
+
+    /* Service picker */
+    .service-picker-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .service-option {
+      border: 1px solid var(--border);
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: all 0.15s;
+      position: relative;
+    }
+    .service-option input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0; height: 0;
+    }
+    .service-option:hover { border-color: var(--rose); }
+    .service-option.selected,
+    .service-option:has(input:checked) {
+      border-color: var(--black);
+      background: var(--cream);
+    }
+    .service-option h4 { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+    .service-option .svc-meta { font-size: 11px; color: var(--gray); }
+    .service-option .svc-price { font-size: 12px; color: var(--rose-dark); margin-top: 4px; font-weight: 500; }
+
+    .form-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 28px 0;
+    }
+
+    .required { color: var(--rose); }
+
+    .form-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+    .hint { font-size: 11px; color: var(--gray); margin-top: 4px; }
+  </style>
+</head>
 <body>
-<nav><a href="/">Home</a> | <a href="/slots">Slots</a> | <strong>Book</strong></nav>
-<h1>Book an Appointment</h1>
-<h3>Selected Slot</h3>
-<p>Start: <strong th:text="${slot.startTime}"></strong></p>
-<p>End: <strong th:text="${slot.endTime}"></strong></p>
-<form method="post" action="/appointments/book" th:object="${appointment}">
-  <input type="hidden" name="slotId" th:value="${slot.slotId}">
-  <label>Select Service:<br>
-    <select name="serviceId">
-      <option th:each="svc : ${services}" th:value="${svc.serviceId}"
-              th:text="${svc.name} + ' ($' + ${svc.priceMin} + '–$' + ${svc.priceMax} + ')'"></option>
-    </select>
-  </label><br><br>
-  <label>Notes:<br>
-    <textarea name="notes" rows="3" cols="40" placeholder="Any special requests..."></textarea>
-  </label><br><br>
-  <button type="submit">Confirm Booking</button>
-  <a href="/slots">Cancel</a>
-</form>
+
+<nav>
+  <a href="/" class="nav-brand">Beautiful Nail</a>
+  <div class="nav-links">
+    <a href="/services">Services</a>
+    <a href="/slots">Availability</a>
+    <a href="/appointments" class="btn btn-sm">My Appointments</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="breadcrumb">
+    <a href="/">Home</a><span>›</span>
+    <a href="/slots">Available Slots</a><span>›</span>
+    Book Appointment
+  </div>
+
+  <h1 class="page-title">Book an Appointment</h1>
+
+  <!-- PROGRESS -->
+  <div class="progress-bar">
+    <div class="step-item">
+      <div class="step-circle done">✓</div>
+      <span class="step-label">Select Slot</span>
+    </div>
+    <div class="step-line done"></div>
+    <div class="step-item">
+      <div class="step-circle active">2</div>
+      <span class="step-label active">Your Details</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step-item">
+      <div class="step-circle inactive">3</div>
+      <span class="step-label inactive">Confirm</span>
+    </div>
+  </div>
+
+  <!-- SLOT SUMMARY -->
+  <div class="summary-bar">
+    <div class="item">
+      <span>Date</span>
+      <strong th:text="${slot.startTime}">Mar 10, 2026</strong>
+    </div>
+    <div class="item">
+      <span>Time</span>
+      <strong th:text="${slot.startTime}">10:00 AM</strong>
+    </div>
+    <div class="item">
+      <span>Until</span>
+      <strong th:text="${slot.endTime}">10:45 AM</strong>
+    </div>
+    <a href="/slots" class="change-link">Change slot</a>
+  </div>
+
+  <!-- FORM -->
+  <div class="form-card">
+    <form method="post" th:action="@{/appointments/book}" th:object="${appointment}">
+      <input type="hidden" name="slotId" th:value="${slot.slotId}">
+
+      <!-- Service selection -->
+      <div class="form-group">
+        <label>Select Service <span class="required">*</span></label>
+        <div class="service-picker-grid">
+          <label class="service-option" th:each="svc : ${services}">
+            <input type="radio" name="serviceId" th:value="${svc.serviceId}" required>
+            <h4 th:text="${svc.name}">Classic Manicure</h4>
+            <div class="svc-meta" th:text="${svc.estDuration} + ' min'">45 min</div>
+            <div class="svc-price" th:text="'$' + ${svc.priceMin} + ' – $' + ${svc.priceMax}">$25–$35</div>
+          </label>
+        </div>
+      </div>
+
+      <hr class="form-divider">
+
+      <!-- Customer info -->
+      <div class="form-grid">
+        <div class="form-group">
+          <label>First Name <span class="required">*</span></label>
+          <input type="text" name="firstName" placeholder="Jane" required>
+        </div>
+        <div class="form-group">
+          <label>Last Name <span class="required">*</span></label>
+          <input type="text" name="lastName" placeholder="Doe" required>
+        </div>
+        <div class="form-group">
+          <label>Email <span class="required">*</span></label>
+          <input type="email" name="email" placeholder="jane@example.com" required>
+          <div class="hint">Confirmation will be sent here</div>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" name="phone" placeholder="(408) 555-0000">
+        </div>
+        <div class="form-group full">
+          <label>Notes (optional)</label>
+          <textarea name="notes" placeholder="Any special requests or preferences..."></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a href="/slots" class="btn">← Back</a>
+        <button type="submit" class="btn btn-rose">Confirm Booking →</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<footer>&copy; 2026 Beautiful Nail &nbsp;·&nbsp; All rights reserved</footer>
+
 </body>
 </html>

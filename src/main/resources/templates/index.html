@@ -1,26 +1,185 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head><meta charset="UTF-8"><title>Beautiful Nail – Home</title></head>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beautiful Nail – Home</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <style>
+    .hero {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 80px 40px;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--rose);
+      margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 56px;
+      font-weight: 500;
+      line-height: 1.15;
+      margin-bottom: 16px;
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero p {
+      color: var(--gray);
+      font-size: 15px;
+      max-width: 440px;
+      margin: 0 auto 32px;
+      line-height: 1.7;
+    }
+    .hero-actions { display: flex; gap: 12px; justify-content: center; }
+
+    /* Services */
+    .services-section { padding: 60px 40px; }
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--rose);
+      margin-bottom: 12px;
+    }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      border: 1px solid var(--border);
+      background: var(--border);
+      margin-top: 28px;
+    }
+    .service-card {
+      background: var(--card-bg);
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .service-card h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      font-weight: 500;
+    }
+    .service-card .meta {
+      font-size: 12px;
+      color: var(--gray);
+    }
+    .service-card .price {
+      font-size: 13px;
+      color: var(--rose-dark);
+      font-weight: 500;
+    }
+    .service-card .book-link {
+      margin-top: auto;
+      padding-top: 16px;
+    }
+
+    /* How it works */
+    .how-section {
+      background: var(--white);
+      padding: 60px 40px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px;
+      margin-top: 40px;
+    }
+    .step-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 64px;
+      font-weight: 400;
+      color: var(--border);
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+    .step h3 {
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      margin-bottom: 8px;
+    }
+    .step p { font-size: 13px; color: var(--gray); line-height: 1.7; }
+  </style>
+</head>
 <body>
+
 <nav>
-  <strong>Beautiful Nail</strong> |
-  <a href="/services">Services</a> |
-  <a href="/slots">View Availability</a>
+  <a href="/" class="nav-brand">Beautiful Nail</a>
+  <div class="nav-links">
+    <a href="/services">Services</a>
+    <a href="/slots">Availability</a>
+    <a href="/appointments" class="btn btn-sm">My Appointments</a>
+  </div>
 </nav>
 
-<h1>Book Your Nail Appointment Online</h1>
-<p>Browse services, choose a stylist, and pick a time — no phone call needed.</p>
-<a href="/slots"><button>Book an Appointment</button></a>
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Online Booking Now Available</div>
+  <h1>Book Your Nail Appointment Online</h1>
+  <p>Browse services, choose a stylist, and pick a time — no phone call needed.</p>
+  <div class="hero-actions">
+    <a href="/slots" class="btn btn-filled">Book an Appointment</a>
+    <a href="/services" class="btn">View Services</a>
+  </div>
+</div>
 
-<h2>Our Services</h2>
-<table border="1" cellpadding="8">
-  <tr><th>Service</th><th>Duration (min)</th><th>Price Range</th><th></th></tr>
-  <tr th:each="svc : ${services}">
-    <td th:text="${svc.name}"></td>
-    <td th:text="${svc.estDuration}"></td>
-    <td th:text="'$' + ${svc.priceMin} + ' – $' + ${svc.priceMax}"></td>
-    <td><a href="/slots">Book</a></td>
-  </tr>
-</table>
+<!-- SERVICES -->
+<section class="services-section">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-label">What We Offer</div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+      <h2 class="page-title" style="margin-bottom:0;">Our Services</h2>
+      <a href="/services" style="font-size:12px;color:var(--gray);text-decoration:none;letter-spacing:0.04em;">View all →</a>
+    </div>
+    <div class="services-grid">
+      <div th:each="svc : ${services}" class="service-card">
+        <h3 th:text="${svc.name}">Service Name</h3>
+        <div class="meta" th:text="${svc.estDuration} + ' min'">45 min</div>
+        <div class="price" th:text="'$' + ${svc.priceMin} + ' – $' + ${svc.priceMax}">$25 – $35</div>
+        <div class="book-link">
+          <a href="/slots" class="btn btn-sm">Book</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-label">Simple Process</div>
+    <h2 class="page-title" style="margin-bottom:0;">How It Works</h2>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>Browse Services</h3>
+        <p>View all available services and pricing upfront — no surprises.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>Pick a Stylist & Time</h3>
+        <p>Select your preferred stylist and choose from available time slots.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>Confirm Booking</h3>
+        <p>Submit your details and receive a confirmation instantly.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>&copy; 2026 Beautiful Nail &nbsp;·&nbsp; All rights reserved</footer>
+
 </body>
 </html>

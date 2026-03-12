@@ -1,25 +1,75 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head><meta charset="UTF-8"><title>My Appointments – Beautiful Nail</title></head>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Appointments – Beautiful Nail</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
 <body>
-<nav><a href="/">Home</a> | <strong>My Appointments</strong></nav>
-<h1>My Appointments</h1>
-<table border="1" cellpadding="8">
-  <tr><th>ID</th><th>Start</th><th>End</th><th>Status</th><th>Notes</th><th></th></tr>
-  <tr th:each="apmt : ${appointments}">
-    <td th:text="${apmt.apmtId}"></td>
-    <td th:text="${apmt.startTime}"></td>
-    <td th:text="${apmt.endTime}"></td>
-    <td th:text="${apmt.status}"></td>
-    <td th:text="${apmt.notes}"></td>
-    <td>
-      <form th:action="@{/appointments/{id}/cancel(id=${apmt.apmtId})}" method="post">
-        <input type="hidden" name="slotId" value="0">
-        <button type="submit">Cancel</button>
-      </form>
-    </td>
-  </tr>
-  <tr th:if="${#lists.isEmpty(appointments)}"><td colspan="6">No appointments found.</td></tr>
-</table>
+
+<nav>
+  <a href="/" class="nav-brand">Beautiful Nail</a>
+  <div class="nav-links">
+    <a href="/services">Services</a>
+    <a href="/slots">Availability</a>
+    <a href="/appointments" style="color:var(--black);" class="btn btn-sm">My Appointments</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="breadcrumb">
+    <a href="/">Home</a><span>›</span>My Appointments
+  </div>
+
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:28px;">
+    <h1 class="page-title" style="margin-bottom:0;">My Appointments</h1>
+    <a href="/slots" class="btn btn-rose">+ Book New</a>
+  </div>
+
+  <div th:if="${!#lists.isEmpty(appointments)}">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Start</th>
+          <th>End</th>
+          <th>Status</th>
+          <th>Notes</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="apmt : ${appointments}">
+          <td th:text="${apmt.apmtId}">1</td>
+          <td th:text="${apmt.startTime}">2026-03-10</td>
+          <td th:text="${apmt.endTime}">2026-03-10</td>
+          <td>
+            <span class="badge"
+              th:classappend="${apmt.status == 'booked'} ? 'badge-booked' : (${apmt.status == 'cancelled'} ? 'badge-cancelled' : 'badge-completed')"
+              th:text="${apmt.status}">booked</span>
+          </td>
+          <td th:text="${apmt.notes != null} ? ${apmt.notes} : '–'">–</td>
+          <td>
+            <form th:action="@{/appointments/{id}/cancel(id=${apmt.apmtId})}" method="post"
+                  th:if="${apmt.status == 'booked'}"
+                  onsubmit="return confirm('Cancel this appointment?')">
+              <input type="hidden" name="slotId" value="0">
+              <button type="submit" class="btn btn-sm btn-danger">Cancel</button>
+            </form>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div th:if="${#lists.isEmpty(appointments)}" style="text-align:center;padding:60px;background:var(--card-bg);border:1px solid var(--border);color:var(--gray);">
+    <p style="font-size:14px;margin-bottom:16px;">No appointments yet.</p>
+    <a href="/slots" class="btn btn-filled">Book an Appointment</a>
+  </div>
+</div>
+
+<footer>&copy; 2026 Beautiful Nail &nbsp;·&nbsp; All rights reserved</footer>
+
 </body>
 </html>
