@@ -62,8 +62,9 @@ public class AvailabilityRepository {
     }
 
     public int markUnavailable(Long slotId) {
+        // AND is_available = 1 ensures atomically that only one transaction wins (optimistic check)
         return jdbc.update(
-            "UPDATE availability_slots SET is_available = 0 WHERE slot_id = ?", slotId
+            "UPDATE availability_slots SET is_available = 0 WHERE slot_id = ? AND is_available = 1", slotId
         );
     }
 

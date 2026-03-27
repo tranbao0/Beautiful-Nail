@@ -49,7 +49,7 @@ public class AppointmentController {
                                  @ModelAttribute Appointment appointment) {
         // TODO: set userId from session
         appointment.setUserId(1L);
-        appointmentService.bookAppointment(appointment, slotId);
+        appointmentService.bookAppointmentWithRetry(appointment, slotId);
         return "redirect:/appointments/confirmation";
     }
 

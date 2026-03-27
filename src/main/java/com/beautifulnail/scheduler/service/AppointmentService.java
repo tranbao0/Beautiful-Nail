@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.dao.DataAccessException;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -42,8 +44,28 @@ public class AppointmentService {
     }
 
     /**
+     * Retry wrapper for bookAppointment. Retries up to 3 times on slot contention
+     * (SQLite busy or slot taken by a concurrent transaction). (M4)
+     */
+    public Appointment bookAppointmentWithRetry(Appointment appointment, Long slotId) {
+        int maxAttempts = 3;
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                return bookAppointment(appointment, slotId);
+            } catch (IllegalStateException e) {
+                log.warn("Booking attempt {}/{} failed for slot {}: {}", attempt, maxAttempts, slotId, e.getMessage());
+                if (attempt == maxAttempts) throw e;
+            } catch (DataAccessException e) {
+                log.warn("DB contention on attempt {}/{} for slot {}", attempt, maxAttempts, slotId);
+                if (attempt == maxAttempts) throw e;
+            }
+        }
+        throw new IllegalStateException("Booking failed after " + maxAttempts + " attempts.");
+    }
+
+    /**
      * Books an appointment with SERIALIZABLE isolation to prevent double-booking.
-     * Checks slot availability, marks slot unavailable, saves appointment, then notifies. (M4)
+     * Checks slot availability, marks slot unavailable atomically, saves appointment, then notifies. (M4)
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public Appointment bookAppointment(Appointment appointment, Long slotId) {
@@ -61,7 +83,13 @@ public class AppointmentService {
         appointment.setEndTime(slot.getEndTime());
         appointment.setStatus("booked");
 
-        availabilityRepo.markUnavailable(slotId);
+        // Optimistic check: affected rows = 0 means another transaction already claimed this slot
+        int updated = availabilityRepo.markUnavailable(slotId);
+        if (updated == 0) {
+            log.warn("Slot {} was claimed by a concurrent transaction", slotId);
+            throw new IllegalStateException("This time slot is no longer available.");
+        }
+
         appointmentRepo.save(appointment);
 
         log.info("Appointment booked successfully for user {}", appointment.getUserId());
