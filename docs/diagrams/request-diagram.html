@@ -12,8 +12,6 @@
       --border:    #e4e4e7;
       --bg:        #f8f9fb;
       --white:     #ffffff;
-      --blue:      #2563eb;
-      --green:     #16a34a;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -74,15 +72,41 @@
       font-size: .85rem;
     }
     .legend-item { display: flex; align-items: center; gap: .5rem; }
-    .leg-line { width: 36px; height: 3px; border-radius: 2px; flex-shrink: 0; }
-    .leg-solid  { background: var(--gray); }
-    .leg-blue   { background: var(--blue); }
-    .leg-green  { background: var(--green); }
-    .leg-dashed {
+
+    /* Arrow glyphs built from CSS so they match Mermaid's rendered style */
+    .leg-arrow {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+    .leg-arrow .shaft {
+      height: 2px;
+      width: 28px;
+    }
+    .leg-arrow .head {
+      width: 0; height: 0;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+    }
+    /* solid arrow */
+    .leg-solid .shaft   { background: var(--gray); }
+    .leg-solid .head    { border-left: 8px solid var(--gray); }
+    /* dashed arrow */
+    .leg-dashed .shaft  {
       background: repeating-linear-gradient(
-        90deg, #64748b 0, #64748b 5px, transparent 5px, transparent 9px
+        90deg, var(--gray) 0, var(--gray) 5px, transparent 5px, transparent 9px
       );
     }
+    .leg-dashed .head   { border-left: 8px solid var(--gray); }
+    /* box swatches */
+    .leg-box {
+      width: 22px; height: 14px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .leg-box-sched { background: rgb(244,244,245); border: 1.5px solid #71717a; }
+    .leg-box-ext   { background: rgb(239,246,255); border: 1.5px solid #2563eb; }
   </style>
 </head>
 <body>
@@ -97,8 +121,9 @@
   <div class="diagram-wrap">
     <div class="mermaid">
 sequenceDiagram
-    box rgb(244,244,245) Appointment Scheduler · localhost:8080
     participant B  as Browser
+
+    box rgb(244,244,245) Appointment Scheduler · localhost:8080
     participant AC as AppointmentController
     participant AS as AppointmentService
     participant NS as NotificationService
@@ -125,7 +150,8 @@ sequenceDiagram
     Note over M  : generate notificationId<br/>simulate delivery
 
     M  -->> NC : 200 OK · NotificationResponse
-    Note over NC,NS : { status: "DELIVERED",<br/>notificationId: "A3F9D12B" }
+    NC -->> NS : NotificationResponse
+    Note over NS : { status: "DELIVERED",<br/>notificationId: "A3F9D12B" }
 
     NS ->> NS : log notificationId + status
     AC -->> B  : redirect /appointments/confirmation
@@ -134,20 +160,24 @@ sequenceDiagram
 
   <div class="legend">
     <div class="legend-item">
-      <div class="leg-line leg-solid"></div>
-      <span>Internal call (within Appointment Scheduler)</span>
+      <div class="leg-arrow leg-solid">
+        <div class="shaft"></div><div class="head"></div>
+      </div>
+      <span>Method call / HTTP request</span>
     </div>
     <div class="legend-item">
-      <div class="leg-line leg-blue"></div>
-      <span>HTTP request crossing the distribution boundary</span>
+      <div class="leg-arrow leg-dashed">
+        <div class="shaft"></div><div class="head"></div>
+      </div>
+      <span>Response / return value</span>
     </div>
     <div class="legend-item">
-      <div class="leg-line leg-green"></div>
-      <span>HTTP / method response</span>
+      <div class="leg-box leg-box-sched"></div>
+      <span>Appointment Scheduler boundary</span>
     </div>
     <div class="legend-item">
-      <div class="leg-line leg-dashed"></div>
-      <span>Self-call / internal side-effect</span>
+      <div class="leg-box leg-box-ext"></div>
+      <span>External service boundary (distribution boundary)</span>
     </div>
   </div>
 </main>
@@ -164,8 +194,8 @@ sequenceDiagram
       primaryTextColor:   '#334155',
 
       /* arrows */
-      signalColor:        '#71717a',
-      signalTextColor:    '#334155',
+      lineColor:          '#71717a',
+      messageTextColor:   '#334155',
 
       /* activation bars */
       activationBkgColor:    '#d4d4d8',
@@ -174,7 +204,6 @@ sequenceDiagram
       /* notes */
       noteBkgColor:  '#fef9c3',
       noteTextColor: '#92400e',
-      noteBorderColor: '#fbbf24',
 
       /* sequence numbers */
       sequenceNumberColor: '#ffffff',
