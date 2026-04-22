@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Request Flow Diagram — Beautiful Nail Scheduler (M5)</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+    :root {
+      --gray:      #71717a;
+      --gray-dark: #3f3f46;
+      --border:    #e4e4e7;
+      --bg:        #f8f9fb;
+      --white:     #ffffff;
+      --blue:      #2563eb;
+      --green:     #16a34a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: #334155;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--gray-dark), var(--gray));
+      color: #fff;
+      padding: 2rem 3rem;
+    }
+    header h1 { font-size: 1.6rem; font-weight: 700; }
+    header p  { margin-top: .35rem; opacity: .85; font-size: .92rem; }
+    .badge {
+      display: inline-block;
+      margin-top: .75rem;
+      background: rgba(255,255,255,.2);
+      border-radius: 999px;
+      padding: .18rem .85rem;
+      font-size: .78rem;
+      font-weight: 600;
+      letter-spacing: .05em;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    .diagram-wrap {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 2rem 1.5rem;
+      overflow-x: auto;
+    }
+
+    /* Mermaid centres the SVG it generates */
+    .diagram-wrap .mermaid {
+      display: flex;
+      justify-content: center;
+    }
+
+    .legend {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin-top: 1.75rem;
+      padding: 1rem 1.5rem;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: .85rem;
+    }
+    .legend-item { display: flex; align-items: center; gap: .5rem; }
+    .leg-line { width: 36px; height: 3px; border-radius: 2px; flex-shrink: 0; }
+    .leg-solid  { background: var(--gray); }
+    .leg-blue   { background: var(--blue); }
+    .leg-green  { background: var(--green); }
+    .leg-dashed {
+      background: repeating-linear-gradient(
+        90deg, #64748b 0, #64748b 5px, transparent 5px, transparent 9px
+      );
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Request Flow Diagram</h1>
+  <p>Sequence of calls from booking submission through the notification boundary</p>
+  <span class="badge">Milestone 5 · Distributed Design</span>
+</header>
+
+<main>
+  <div class="diagram-wrap">
+    <div class="mermaid">
+sequenceDiagram
+    box rgb(244,244,245) Appointment Scheduler · localhost:8080
+    participant B  as Browser
+    participant AC as AppointmentController
+    participant AS as AppointmentService
+    participant NS as NotificationService
+    participant NC as NotificationClient
+    end
+
+    box rgb(239,246,255) External Notification Service (stub)
+    participant M  as MockNotifyController
+    end
+
+    B  ->> AC : POST /appointments/book
+    AC ->> AS : bookAppointmentWithRetry()
+
+    AS ->> AS : availabilityRepo.findById()<br/>→ slot exists & available
+    AS ->> AS : availabilityRepo.markUnavailable()<br/>→ atomic UPDATE, 1 row affected
+    AS ->> AS : appointmentRepo.save()<br/>→ apmt_id assigned
+
+    AS ->> NS : sendConfirmation(appointment)
+    NS ->> NC : sendConfirmation(appt, name, email)
+
+    Note over NC : Builds NotificationRequest<br/>{ type, channel, recipient, appointment }
+
+    NC ->> M  : POST /api/external/notifications
+    Note over M  : generate notificationId<br/>simulate delivery
+
+    M  -->> NC : 200 OK · NotificationResponse
+    Note over NC,NS : { status: "DELIVERED",<br/>notificationId: "A3F9D12B" }
+
+    NS ->> NS : log notificationId + status
+    AC -->> B  : redirect /appointments/confirmation
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="leg-line leg-solid"></div>
+      <span>Internal call (within Appointment Scheduler)</span>
+    </div>
+    <div class="legend-item">
+      <div class="leg-line leg-blue"></div>
+      <span>HTTP request crossing the distribution boundary</span>
+    </div>
+    <div class="legend-item">
+      <div class="leg-line leg-green"></div>
+      <span>HTTP / method response</span>
+    </div>
+    <div class="legend-item">
+      <div class="leg-line leg-dashed"></div>
+      <span>Self-call / internal side-effect</span>
+    </div>
+  </div>
+</main>
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    themeVariables: {
+      /* participant boxes */
+      primaryColor:       '#f4f4f5',
+      primaryBorderColor: '#71717a',
+      primaryTextColor:   '#334155',
+
+      /* arrows */
+      signalColor:        '#71717a',
+      signalTextColor:    '#334155',
+
+      /* activation bars */
+      activationBkgColor:    '#d4d4d8',
+      activationBorderColor: '#71717a',
+
+      /* notes */
+      noteBkgColor:  '#fef9c3',
+      noteTextColor: '#92400e',
+      noteBorderColor: '#fbbf24',
+
+      /* sequence numbers */
+      sequenceNumberColor: '#ffffff',
+
+      fontFamily: 'Inter, sans-serif',
+      fontSize:   '14px',
+    },
+    sequence: {
+      showSequenceNumbers: true,
+      actorMargin:         80,
+      boxMargin:           12,
+      boxTextMargin:       6,
+      noteMargin:          14,
+      messageMargin:       40,
+      mirrorActors:        false,
+    }
+  });
+</script>
+
+</body>
+</html>
