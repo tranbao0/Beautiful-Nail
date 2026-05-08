@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M6 System Management + Logging Plan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.6;
+            color: #333;
+            padding: 40px;
+            max-width: 8.5in;
+            margin: 0 auto;
+            background: white;
+        }
+        .title-page {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-top: 100px;
+        }
+        h1 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .course-info {
+            font-size: 14px;
+            margin-bottom: 30px;
+            line-height: 2;
+        }
+        h2 {
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 30px;
+            margin-bottom: 10px;
+            text-decoration: underline;
+        }
+        h3 {
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+        p {
+            margin-bottom: 12px;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 40px;
+            margin-bottom: 12px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .code-block {
+            background-color: #f5f5f5;
+            border-left: 4px solid #999;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .section {
+            page-break-inside: avoid;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        table th, table td {
+            border: 1px solid #999;
+            padding: 8px;
+            text-align: left;
+            font-size: 12px;
+        }
+        table th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+        .page-break {
+            page-break-after: always;
+        }
+        .appendix {
+            margin-top: 40px;
+            border-top: 2px solid #000;
+            padding-top: 20px;
+        }
+        @media print {
+            body {
+                padding: 0;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="title-page">
+    <h1>M6: System Management + Logging Plan</h1>
+    <div class="course-info">
+        <strong>CMPE 172 - Spring 2026 Term Project</strong><br>
+        <strong>Beautiful Nail Salon Appointment Scheduling System</strong><br>
+        Student: Bao Tran<br>
+        Submission Date: April 29, 2026
+    </div>
+</div>
+
+<div class="section">
+    <h2>1. Logging Plan</h2>
+
+    <h3>1.1 What to Log</h3>
+    <p>
+        The Beautiful Nail appointment scheduling system logs critical business events and system errors to ensure observability
+        and rapid incident response. The following categories are logged:
+    </p>
+    <ul>
+        <li><strong>Appointment Operations:</strong> Booking attempts, successful bookings, cancellations, confirmation notifications</li>
+        <li><strong>Concurrency & Transaction Events:</strong> Retry attempts, slot contention, isolation level enforcement, version check failures</li>
+        <li><strong>External Service Integration:</strong> Notification service calls, failures, timeouts, recovery attempts</li>
+        <li><strong>System Errors:</strong> Database connection failures, transaction rollbacks, unexpected exceptions</li>
+        <li><strong>Access Patterns:</strong> User authentication events, endpoint access (at DEBUG level)</li>
+    </ul>
+
+    <h3>1.2 Example Log Messages</h3>
+
+    <h4>INFO Level - Normal Business Operations</h4>
+    <div class="code-block">
+[INFO] 2026-04-29 14:23:15 com.beautifulnail.scheduler.service.AppointmentService - Attempting to book appointment for user 5 on slot 42
+[INFO] 2026-04-29 14:23:16 com.beautifulnail.scheduler.service.AppointmentService - Appointment booked successfully for user 5
+[INFO] 2026-04-29 14:23:17 com.beautifulnail.scheduler.notification.NotificationService - Sending confirmation notification for appointment 127
+[INFO] 2026-04-29 14:23:18 com.beautifulnail.scheduler.service.AppointmentService - Cancelling appointment 125
+[INFO] 2026-04-29 14:23:19 com.beautifulnail.scheduler.service.AppointmentService - Appointment 125 cancelled, slot 42 re-opened
+    </div>
+
+    <h4>WARN Level - Contention & Retry Logic</h4>
+    <div class="code-block">
+[WARN] 2026-04-29 14:24:05 com.beautifulnail.scheduler.service.AppointmentService - Booking attempt 1/3 failed for slot 42: This time slot is no longer available.
+[WARN] 2026-04-29 14:24:06 com.beautifulnail.scheduler.service.AppointmentService - DB contention on attempt 2/3 for slot 42
+[WARN] 2026-04-29 14:24:08 com.beautifulnail.scheduler.service.AppointmentService - Slot 42 was claimed by a concurrent transaction
+[WARN] 2026-04-29 14:24:10 com.beautifulnail.scheduler.notification.NotificationService - Notification service unavailable, retrying in 2 seconds
+    </div>
+
+    <h4>ERROR Level - System Failures</h4>
+    <div class="code-block">
+[ERROR] 2026-04-29 14:25:30 com.beautifulnail.scheduler.service.AppointmentService - Booking failed after 3 attempts: SQLite database locked
+[ERROR] 2026-04-29 14:25:31 com.beautifulnail.scheduler.notification.NotificationService - Failed to send confirmation after 3 retries: Connection timeout
+[ERROR] 2026-04-29 14:25:32 com.beautifulnail.scheduler.controller.HealthController - Database connection test failed: JDBC connection refused
+    </div>
+</div>
+
+<div class="section">
+    <h2>2. Monitoring Metrics</h2>
+
+    <p>
+        The system tracks three critical metrics to monitor operational health and identify performance degradation in production.
+    </p>
+
+    <h3>2.1 Number of Bookings Per Hour</h3>
+    <p>
+        <strong>Purpose:</strong> Tracks business volume and user demand patterns over time.
+    </p>
+    <p>
+        <strong>Implementation:</strong> A counter metric increments each time an appointment is successfully booked.
+        A scheduled task (every 60 seconds) records the cumulative count to a metrics log, resets the counter, and makes
+        the data available via the <code>/metrics/bookings</code> endpoint.
+    </p>
+    <p>
+        <strong>Alert Threshold:</strong> If hourly bookings drop below 5 (indicating potential service outage),
+        an WARNING is logged to alert operators.
+    </p>
+
+    <h3>2.2 Failed Bookings</h3>
+    <p>
+        <strong>Purpose:</strong> Identifies user experience issues and booking system reliability problems.
+    </p>
+    <p>
+        <strong>Implementation:</strong> A counter increments whenever a booking attempt fails (including all 3 retry attempts).
+        Failures are categorized by reason (slot unavailable, database locked, service error). The metric is exposed via
+        <code>/metrics/bookings/failed</code> with a breakdown by error type.
+    </p>
+    <p>
+        <strong>Alert Threshold:</strong> If the failure rate exceeds 10% of total booking attempts within a 5-minute window,
+        an ERROR is logged and operators are notified.
+    </p>
+
+    <h3>2.3 Average Latency of Booking Operation</h3>
+    <p>
+        <strong>Purpose:</strong> Measures user-facing performance and identifies database or service bottlenecks.
+    </p>
+    <p>
+        <strong>Implementation:</strong> A timer captures elapsed time from the start of the booking request to successful completion
+        (or failure). Latency samples are recorded in a rolling window, and the endpoint <code>/metrics/bookings/latency</code>
+        provides mean, min, max, and p99 percentile latency values.
+    </p>
+    <p>
+        <strong>Alert Threshold:</strong> If p99 latency exceeds 5 seconds, a WARNING is logged. If p99 latency exceeds 10 seconds,
+        an ERROR is logged indicating potential cascading failures.
+    </p>
+</div>
+
+<div class="section">
+    <h2>3. Failure Scenario + Recovery Strategy</h2>
+
+    <h3>3.1 Failure Scenario: Notification Service Unavailable</h3>
+    <p>
+        <strong>Scenario Description:</strong> The external notification service becomes temporarily unavailable, causing
+        booking confirmation emails to fail. Users complete the appointment booking successfully, but the confirmation
+        notification cannot be sent. If recovery is not implemented, users will not receive confirmation details.
+    </p>
+    <p>
+        <strong>Sequence:</strong>
+    </p>
+    <ol>
+        <li>User submits booking request at 14:30:00</li>
+        <li>AppointmentService successfully reserves the slot and creates appointment record</li>
+        <li>NotificationService attempts to call external API at notification.service.url</li>
+        <li>External service returns HTTP 503 Service Unavailable</li>
+        <li>Transaction currently active - notification failure occurs after slot is reserved</li>
+    </ol>
+
+    <h3>3.2 Recovery Strategy</h3>
+    <p>
+        <strong>A. Immediate Retry with Exponential Backoff</strong>
+    </p>
+    <ul>
+        <li>NotificationService implements up to 3 automatic retries with exponential backoff (1s, 2s, 4s)</li>
+        <li>Each retry attempt is logged at WARN level with attempt number and elapsed time</li>
+        <li>If all 3 retries fail, the exception is logged but NOT propagated (graceful degradation)</li>
+    </ul>
+
+    <p>
+        <strong>B. Asynchronous Queue Fallback</strong>
+    </p>
+    <ul>
+        <li>If notification fails after retries, the notification request is queued to an in-memory deque with a TTL of 24 hours</li>
+        <li>A background task runs every 30 seconds to attempt sending queued notifications</li>
+        <li>Successfully sent notifications are removed from the queue; failed ones are retried or discarded after TTL expires</li>
+    </ul>
+
+    <p>
+        <strong>C. User Notification via Alternative Channel</strong>
+    </p>
+    <ul>
+        <li>If notification service remains unavailable, users can retrieve their confirmation via the <code>/appointments/&lt;id&gt;/confirmation</code> endpoint</li>
+        <li>This ensures users can always access their booking details even if email notifications fail</li>
+    </ul>
+
+    <p>
+        <strong>D. Operational Alerting</strong>
+    </p>
+    <ul>
+        <li>After the first failed notification, a WARN is logged: "Notification service unavailable, retrying in X seconds"</li>
+        <li>After 3 consecutive failed notifications across different appointments, an ERROR is logged: "Notification service degraded; users may not receive confirmations"</li>
+        <li>This alert signals operators to investigate the external service health</li>
+    </ul>
+</div>
+
+<div class="section">
+    <h2>4. Health Check Endpoint Design</h2>
+
+    <h3>4.1 Endpoint Specification</h3>
+    <p>
+        <strong>URL:</strong> <code>GET /health</code><br>
+        <strong>Content-Type:</strong> application/json<br>
+        <strong>Response Time SLA:</strong> &lt; 500ms
+    </p>
+
+    <h3>4.2 Health Check Response</h3>
+    <p>
+        The endpoint returns a JSON object indicating the overall system status and the status of critical dependencies:
+    </p>
+
+    <h3>4.3 Response Codes</h3>
+    <table>
+        <tr>
+            <th>Status</th>
+            <th>HTTP Code</th>
+            <th>Meaning</th>
+        </tr>
+        <tr>
+            <td>UP</td>
+            <td>200 OK</td>
+            <td>All systems healthy; requests can be served</td>
+        </tr>
+        <tr>
+            <td>DEGRADED</td>
+            <td>200 OK</td>
+            <td>Core services operational but secondary services (e.g., notifications) unavailable</td>
+        </tr>
+        <tr>
+            <td>DOWN</td>
+            <td>503 Service Unavailable</td>
+            <td>Critical dependencies (database) unreachable; requests cannot be served</td>
+        </tr>
+    </table>
+
+    <h3>4.4 Example Health Responses</h3>
+
+    <h4>Healthy State (HTTP 200)</h4>
+    <div class="code-block">
+{
+  "status": "UP",
+  "timestamp": "2026-04-29T14:35:22Z",
+  "checks": {
+    "database": {
+      "status": "UP",
+      "message": "SQLite connected"
+    },
+    "notification_service": {
+      "status": "UP",
+      "message": "External service responding"
+    }
+  }
+}
+    </div>
+
+    <h4>Degraded State (HTTP 200)</h4>
+    <div class="code-block">
+{
+  "status": "DEGRADED",
+  "timestamp": "2026-04-29T14:36:10Z",
+  "checks": {
+    "database": {
+      "status": "UP",
+      "message": "SQLite connected"
+    },
+    "notification_service": {
+      "status": "DOWN",
+      "message": "Unable to reach http://localhost:8080/api/external/notifications (timeout)"
+    }
+  }
+}
+    </div>
+
+    <h4>Down State (HTTP 503)</h4>
+    <div class="code-block">
+{
+  "status": "DOWN",
+  "timestamp": "2026-04-29T14:37:05Z",
+  "error": "Cannot serve requests",
+  "checks": {
+    "database": {
+      "status": "DOWN",
+      "message": "JDBC connection refused: Connection refused"
+    }
+  }
+}
+    </div>
+</div>
+
+<div class="appendix">
+    <h2>Appendix: Code Snippets</h2>
+
+    <h3>A.1 Logging Configuration (application.properties)</h3>
+    <div class="code-block">
+# Logging Configuration
+logging.level.com.beautifulnail=INFO
+logging.level.org.springframework.jdbc=DEBUG
+logging.file.name=logs/application.log
+logging.file.max-size=10MB
+logging.file.max-history=10
+logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
+    </div>
+
+    <h3>A.2 Appointment Booking with Logging (AppointmentService.java)</h3>
+    <div class="code-block">
+@Service
+public class AppointmentService {
+    private static final Logger log = LoggerFactory.getLogger(AppointmentService.class);
+    private final AtomicInteger bookingsPerHour = new AtomicInteger(0);
+    private final AtomicInteger failedBookings = new AtomicInteger(0);
+
+    public Appointment bookAppointmentWithRetry(Appointment appointment, Long slotId) {
+        int maxAttempts = 3;
+        long startTime = System.currentTimeMillis();
+
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                return bookAppointment(appointment, slotId);
+            } catch (IllegalStateException e) {
+                log.warn("Booking attempt {}/{} failed for slot {}: {}",
+                    attempt, maxAttempts, slotId, e.getMessage());
+                if (attempt == maxAttempts) {
+                    failedBookings.incrementAndGet();
+                    long duration = System.currentTimeMillis() - startTime;
+                    log.error("Booking failed after {} attempts ({}ms)", maxAttempts, duration);
+                    throw e;
+                }
+            }
+        }
+        throw new IllegalStateException("Booking failed after " + maxAttempts + " attempts.");
+    }
+
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public Appointment bookAppointment(Appointment appointment, Long slotId) {
+        log.info("Attempting to book appointment for user {} on slot {}",
+            appointment.getUserId(), slotId);
+
+        var slot = availabilityRepo.findById(slotId)
+            .orElseThrow(() -> new IllegalArgumentException("Slot not found: " + slotId));
+
+        if (!slot.isAvailable()) {
+            log.warn("Slot {} is no longer available", slotId);
+            throw new IllegalStateException("This time slot is no longer available.");
+        }
+
+        int updated = availabilityRepo.markUnavailable(slotId);
+        if (updated == 0) {
+            log.warn("Slot {} was claimed by a concurrent transaction", slotId);
+            throw new IllegalStateException("This time slot is no longer available.");
+        }
+
+        appointmentRepo.save(appointment);
+        bookingsPerHour.incrementAndGet();
+
+        log.info("Appointment booked successfully for user {}", appointment.getUserId());
+        notificationService.sendConfirmation(appointment);
+
+        return appointment;
+    }
+}
+    </div>
+
+    <h3>A.3 Health Check Endpoint (HealthController.java)</h3>
+    <div class="code-block">
+@RestController
+public class HealthController {
+    private static final Logger log = LoggerFactory.getLogger(HealthController.class);
+    private final JdbcTemplate jdbc;
+    private final NotificationClient notificationClient;
+
+    @GetMapping("/health")
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; health() {
+        Map&lt;String, Object&gt; response = new HashMap&lt;&gt;();
+        Map&lt;String, Object&gt; checks = new HashMap&lt;&gt;();
+
+        // Check database
+        Map&lt;String, String&gt; dbCheck = new HashMap&lt;&gt;();
+        try {
+            jdbc.queryForObject("SELECT 1", Integer.class);
+            dbCheck.put("status", "UP");
+            dbCheck.put("message", "SQLite connected");
+        } catch (Exception e) {
+            dbCheck.put("status", "DOWN");
+            dbCheck.put("message", "JDBC connection refused: " + e.getMessage());
+            log.error("Database health check failed", e);
+            response.put("status", "DOWN");
+            response.put("error", "Cannot serve requests");
+            checks.put("database", dbCheck);
+            response.put("checks", checks);
+            response.put("timestamp", Instant.now());
+            return ResponseEntity.status(503).body(response);
+        }
+        checks.put("database", dbCheck);
+
+        // Check notification service
+        Map&lt;String, String&gt; notifCheck = new HashMap&lt;&gt;();
+        try {
+            boolean notifHealthy = notificationClient.isHealthy();
+            notifCheck.put("status", notifHealthy ? "UP" : "DOWN");
+            notifCheck.put("message", notifHealthy ?
+                "External service responding" :
+                "Unable to reach notification service (timeout)");
+        } catch (Exception e) {
+            notifCheck.put("status", "DOWN");
+            notifCheck.put("message", "Unable to reach notification service");
+            log.warn("Notification service health check failed", e);
+        }
+        checks.put("notification_service", notifCheck);
+
+        // Determine overall status
+        String overallStatus = "UP";
+        if ("DOWN".equals(notifCheck.get("status"))) {
+            overallStatus = "DEGRADED";
+        }
+
+        response.put("status", overallStatus);
+        response.put("timestamp", Instant.now());
+        response.put("checks", checks);
+
+        return ResponseEntity.ok(response);
+    }
+}
+    </div>
+
+    <h3>A.4 Notification Service with Retry Logic</h3>
+    <div class="code-block">
+@Service
+public class NotificationService {
+    private static final Logger log = LoggerFactory.getLogger(NotificationService.class);
+    private final RestTemplate restTemplate;
+    private final Queue&lt;NotificationRequest&gt; retryQueue = new LinkedList&lt;&gt;();
+    private final String notificationServiceUrl;
+
+    public void sendConfirmation(Appointment appointment) {
+        NotificationRequest request = new NotificationRequest(appointment);
+        sendWithRetry(request);
+    }
+
+    private void sendWithRetry(NotificationRequest request) {
+        int maxRetries = 3;
+        int[] backoffMs = {1000, 2000, 4000};
+
+        for (int attempt = 0; attempt &lt; maxRetries; attempt++) {
+            try {
+                restTemplate.postForObject(notificationServiceUrl, request, String.class);
+                log.info("Notification sent successfully for appointment {}",
+                    request.getAppointmentId());
+                return;
+            } catch (RestClientException e) {
+                log.warn("Notification attempt {}/{} failed: {}", attempt + 1, maxRetries, e.getMessage());
+
+                if (attempt &lt; maxRetries - 1) {
+                    try {
+                        Thread.sleep(backoffMs[attempt]);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }
+        }
+
+        // All retries failed - queue for later
+        log.error("Notification failed after {} retries; queuing for async retry", maxRetries);
+        retryQueue.offer(request);
+    }
+
+    @Scheduled(fixedDelay = 30000) // Every 30 seconds
+    public void processRetryQueue() {
+        while (!retryQueue.isEmpty()) {
+            NotificationRequest request = retryQueue.poll();
+            try {
+                restTemplate.postForObject(notificationServiceUrl, request, String.class);
+                log.info("Queued notification sent successfully for appointment {}",
+                    request.getAppointmentId());
+            } catch (Exception e) {
+                log.warn("Queued notification still failing; will retry later");
+                retryQueue.offer(request);
+                break;
+            }
+        }
+    }
+}
+    </div>
+
+    <h3>A.5 Booking Metrics Endpoint</h3>
+    <div class="code-block">
+@RestController
+@RequestMapping("/metrics")
+public class MetricsController {
+    private final AppointmentService appointmentService;
+
+    @GetMapping("/bookings")
+    public Map&lt;String, Object&gt; getBookingMetrics() {
+        Map&lt;String, Object&gt; metrics = new HashMap&lt;&gt;();
+        metrics.put("bookings_this_hour", appointmentService.getBookingsPerHour());
+        metrics.put("failed_bookings", appointmentService.getFailedBookings());
+        metrics.put("timestamp", Instant.now());
+        return metrics;
+    }
+
+    @GetMapping("/bookings/latency")
+    public Map&lt;String, Object&gt; getLatencyMetrics() {
+        Map&lt;String, Object&gt; metrics = new HashMap&lt;&gt;();
+        metrics.put("avg_latency_ms", appointmentService.getAvgLatency());
+        metrics.put("p99_latency_ms", appointmentService.getP99Latency());
+        metrics.put("max_latency_ms", appointmentService.getMaxLatency());
+        return metrics;
+    }
+}
+    </div>
+</div>
+
+</body>
+</html>

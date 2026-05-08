@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Distribution Diagram — Beautiful Nail Scheduler (M5)</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Fira+Code:wght@400;500&display=swap');
+
+    :root {
+      --rose:        #c2848a;
+      --rose-dark:   #9e5f65;
+      --rose-light:  #f5e8ea;
+      --slate:       #334155;
+      --slate-light: #64748b;
+      --border:      #e2e8f0;
+      --bg:          #f8f9fb;
+      --white:       #ffffff;
+      --green:       #16a34a;
+      --blue:        #2563eb;
+      --amber:       #d97706;
+      --code-bg:     #1e293b;
+      --code-text:   #e2e8f0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--slate);
+      line-height: 1.6;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--rose-dark), var(--rose));
+      color: var(--white);
+      padding: 2.5rem 3rem;
+    }
+    header h1 { font-size: 1.75rem; font-weight: 700; }
+    header p  { margin-top: .4rem; opacity: .85; font-size: .95rem; }
+    header .badge {
+      display: inline-block;
+      margin-top: .8rem;
+      background: rgba(255,255,255,.2);
+      border-radius: 999px;
+      padding: .2rem .9rem;
+      font-size: .8rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+    }
+
+    main { max-width: 1100px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+
+    h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--rose-dark);
+      border-bottom: 2px solid var(--rose-light);
+      padding-bottom: .4rem;
+      margin-bottom: 1.25rem;
+    }
+    h3 { font-size: 1rem; font-weight: 600; color: var(--slate); margin-bottom: .5rem; }
+
+    section { margin-bottom: 3rem; }
+
+    /* ── Diagram ── */
+    .diagram-wrap {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 2rem;
+      overflow-x: auto;
+    }
+
+    svg { display: block; margin: 0 auto; }
+
+    /* ── Two-column layout ── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+    }
+    .card.good  { border-left: 4px solid var(--green); }
+    .card.bad   { border-left: 4px solid #dc2626; }
+    .card.info  { border-left: 4px solid var(--blue); }
+
+    .card ul { padding-left: 1.2rem; }
+    .card li { margin-bottom: .35rem; font-size: .92rem; }
+
+    /* ── Endpoint table ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .9rem;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    th {
+      background: var(--rose-light);
+      color: var(--rose-dark);
+      font-weight: 700;
+      text-align: left;
+      padding: .65rem 1rem;
+    }
+    td { padding: .6rem 1rem; border-top: 1px solid var(--border); vertical-align: top; }
+    tr:hover td { background: #fafafa; }
+
+    /* ── Code block ── */
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      font-family: 'Fira Code', monospace;
+      font-size: .82rem;
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      overflow-x: auto;
+      line-height: 1.7;
+    }
+    .kw  { color: #93c5fd; }
+    .str { color: #86efac; }
+    .cmt { color: #94a3b8; font-style: italic; }
+    .key { color: #fda4af; }
+
+    /* ── Tag pills ── */
+    .pill {
+      display: inline-block;
+      border-radius: 999px;
+      padding: .15rem .7rem;
+      font-size: .75rem;
+      font-weight: 600;
+    }
+    .pill.post   { background: #dbeafe; color: var(--blue); }
+    .pill.get    { background: #dcfce7; color: var(--green); }
+    .pill.ext    { background: var(--rose-light); color: var(--rose-dark); }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Distribution Diagram</h1>
+  <p>Beautiful Nail Appointment Scheduler — External Notification Service Boundary</p>
+  <span class="badge">Milestone 5 · Distributed Design</span>
+</header>
+
+<main>
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 1 — Architecture Diagram (SVG)
+       ═══════════════════════════════════════════ -->
+  <section>
+    <h2>Architecture Diagram</h2>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 920 520" width="100%" xmlns="http://www.w3.org/2000/svg"
+           font-family="Inter, sans-serif">
+
+        <!-- ── Background panels ── -->
+        <!-- Main app zone -->
+        <rect x="10" y="10" width="580" height="500" rx="14"
+              fill="#fdf2f4" stroke="#e8c5cb" stroke-width="1.5" stroke-dasharray="6 3"/>
+        <text x="26" y="34" font-size="11" fill="#9e5f65" font-weight="700"
+              letter-spacing=".06em">BEAUTIFUL NAIL SCHEDULER  (:8080)</text>
+
+        <!-- External service zone -->
+        <rect x="630" y="10" width="280" height="500" rx="14"
+              fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5" stroke-dasharray="6 3"/>
+        <text x="646" y="34" font-size="11" fill="#2563eb" font-weight="700"
+              letter-spacing=".06em">MOCK NOTIFICATION SERVICE</text>
+        <text x="646" y="50" font-size="10" fill="#64748b">(pretends to be external)</text>
+
+        <!-- ── Client box ── -->
+        <rect x="30" y="60" width="150" height="80" rx="10"
+              fill="#fff" stroke="#c2848a" stroke-width="2"/>
+        <text x="105" y="92" text-anchor="middle" font-size="13" font-weight="700"
+              fill="#334155">Browser</text>
+        <text x="105" y="110" text-anchor="middle" font-size="11" fill="#64748b">Customer / Postman</text>
+        <text x="105" y="127" text-anchor="middle" font-size="10" fill="#9e5f65">Client</text>
+
+        <!-- ── Controller box ── -->
+        <rect x="220" y="48" width="175" height="110" rx="10"
+              fill="#fff" stroke="#c2848a" stroke-width="2"/>
+        <text x="308" y="73" text-anchor="middle" font-size="12" font-weight="700"
+              fill="#334155">AppointmentController</text>
+        <line x1="228" y1="81" x2="387" y2="81" stroke="#f0d0d3" stroke-width="1"/>
+        <text x="308" y="98"  text-anchor="middle" font-size="10.5" fill="#64748b">POST /appointments/book</text>
+        <text x="308" y="115" text-anchor="middle" font-size="10.5" fill="#64748b">POST /api/notify</text>
+        <text x="308" y="133" text-anchor="middle" font-size="10" fill="#9e5f65">Controller Layer</text>
+
+        <!-- ── AppointmentService box ── -->
+        <rect x="220" y="190" width="175" height="90" rx="10"
+              fill="#fff" stroke="#c2848a" stroke-width="2"/>
+        <text x="308" y="215" text-anchor="middle" font-size="12" font-weight="700"
+              fill="#334155">AppointmentService</text>
+        <line x1="228" y1="222" x2="387" y2="222" stroke="#f0d0d3" stroke-width="1"/>
+        <text x="308" y="239" text-anchor="middle" font-size="10.5" fill="#64748b">bookAppointmentWithRetry()</text>
+        <text x="308" y="256" text-anchor="middle" font-size="10" fill="#9e5f65">Service Layer · SERIALIZABLE</text>
+        <text x="308" y="270" text-anchor="middle" font-size="10" fill="#64748b">→ calls NotificationService</text>
+
+        <!-- ── NotificationService box ── -->
+        <rect x="220" y="315" width="175" height="80" rx="10"
+              fill="#fff5f6" stroke="#c2848a" stroke-width="2"/>
+        <text x="308" y="340" text-anchor="middle" font-size="12" font-weight="700"
+              fill="#334155">NotificationService</text>
+        <line x1="228" y1="347" x2="387" y2="347" stroke="#f0d0d3" stroke-width="1"/>
+        <text x="308" y="363" text-anchor="middle" font-size="10.5" fill="#64748b">sendConfirmation(appt)</text>
+        <text x="308" y="380" text-anchor="middle" font-size="10" fill="#9e5f65">Service Layer</text>
+
+        <!-- ── NotificationClient box ── -->
+        <rect x="220" y="425" width="175" height="75" rx="10"
+              fill="#fdf2f4" stroke="#c2848a" stroke-width="2"/>
+        <text x="308" y="450" text-anchor="middle" font-size="12" font-weight="700"
+              fill="#334155">NotificationClient</text>
+        <line x1="228" y1="457" x2="387" y2="457" stroke="#f0d0d3" stroke-width="1"/>
+        <text x="308" y="473" text-anchor="middle" font-size="10.5" fill="#64748b">sendConfirmation()</text>
+        <text x="308" y="489" text-anchor="middle" font-size="10" fill="#9e5f65">RestTemplate · HTTP</text>
+
+        <!-- ── MockNotificationController box ── -->
+        <rect x="648" y="180" width="245" height="200" rx="10"
+              fill="#fff" stroke="#2563eb" stroke-width="2"/>
+        <text x="770" y="207" text-anchor="middle" font-size="12" font-weight="700"
+              fill="#334155">MockNotificationController</text>
+        <line x1="656" y1="215" x2="885" y2="215" stroke="#bfdbfe" stroke-width="1"/>
+        <text x="770" y="234" text-anchor="middle" font-size="11" fill="#2563eb" font-weight="600">
+          POST /api/external/notifications
+        </text>
+        <text x="770" y="258" text-anchor="middle" font-size="10.5" fill="#64748b">Receives NotificationRequest</text>
+        <text x="770" y="276" text-anchor="middle" font-size="10.5" fill="#64748b">{ type, channel, recipient,</text>
+        <text x="770" y="294" text-anchor="middle" font-size="10.5" fill="#64748b">  appointment }</text>
+        <text x="770" y="316" text-anchor="middle" font-size="10.5" fill="#64748b">Returns NotificationResponse</text>
+        <text x="770" y="334" text-anchor="middle" font-size="10.5" fill="#64748b">{ status, notificationId, ... }</text>
+        <text x="770" y="367" text-anchor="middle" font-size="10" fill="#2563eb">External Service Stub</text>
+
+        <!-- ── Vertical internal arrows (left block) ── -->
+        <!-- client → controller -->
+        <line x1="180" y1="100" x2="220" y2="100" stroke="#c2848a" stroke-width="2"
+              marker-end="url(#arrow-rose)"/>
+        <text x="200" y="88" text-anchor="middle" font-size="9" fill="#9e5f65">POST</text>
+        <text x="200" y="99" text-anchor="middle" font-size="8.5" fill="#9e5f65">/appointments/book</text>
+
+        <!-- controller → service (down) -->
+        <line x1="308" y1="158" x2="308" y2="190" stroke="#c2848a" stroke-width="1.5"
+              stroke-dasharray="4 2" marker-end="url(#arrow-rose)"/>
+        <text x="320" y="179" font-size="9" fill="#9e5f65">bookAppointment()</text>
+
+        <!-- service → notif svc (down) -->
+        <line x1="308" y1="280" x2="308" y2="315" stroke="#c2848a" stroke-width="1.5"
+              stroke-dasharray="4 2" marker-end="url(#arrow-rose)"/>
+        <text x="320" y="302" font-size="9" fill="#9e5f65">sendConfirmation(appt)</text>
+
+        <!-- notif svc → client (down) -->
+        <line x1="308" y1="395" x2="308" y2="425" stroke="#c2848a" stroke-width="1.5"
+              stroke-dasharray="4 2" marker-end="url(#arrow-rose)"/>
+        <text x="320" y="415" font-size="9" fill="#9e5f65">delegate to client</text>
+
+        <!-- ── Distribution boundary arrow (main crossing) ── -->
+        <!-- Dashed boundary line -->
+        <line x1="610" y1="20" x2="610" y2="500" stroke="#94a3b8" stroke-width="1.5"
+              stroke-dasharray="8 4"/>
+        <text x="610" y="511" text-anchor="middle" font-size="10" fill="#64748b"
+              font-weight="600">Distribution Boundary</text>
+
+        <!-- NotificationClient → MockController (HTTP crossing) -->
+        <line x1="395" y1="462" x2="648" y2="270" stroke="#2563eb" stroke-width="2.5"
+              marker-end="url(#arrow-blue)"/>
+        <!-- Label box on the arrow -->
+        <rect x="410" y="340" width="200" height="52" rx="7"
+              fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.2"/>
+        <text x="510" y="358" text-anchor="middle" font-size="10.5" font-weight="700"
+              fill="#2563eb">POST /api/external/notifications</text>
+        <text x="510" y="375" text-anchor="middle" font-size="10" fill="#64748b">NotificationRequest (JSON)</text>
+        <text x="510" y="388" text-anchor="middle" font-size="9.5" fill="#2563eb">COARSE-GRAINED · one call</text>
+
+        <!-- Response arrow back -->
+        <line x1="648" y1="300" x2="395" y2="480" stroke="#16a34a" stroke-width="1.5"
+              stroke-dasharray="5 3" marker-end="url(#arrow-green)"/>
+        <text x="500" y="430" text-anchor="middle" font-size="9.5" fill="#16a34a"
+              font-weight="600">NotificationResponse { DELIVERED }</text>
+
+        <!-- ── Arrow markers ── -->
+        <defs>
+          <marker id="arrow-rose" markerWidth="8" markerHeight="8"
+                  refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#c2848a"/>
+          </marker>
+          <marker id="arrow-blue" markerWidth="9" markerHeight="9"
+                  refX="7" refY="3.5" orient="auto">
+            <path d="M0,0 L0,7 L9,3.5 z" fill="#2563eb"/>
+          </marker>
+          <marker id="arrow-green" markerWidth="8" markerHeight="8"
+                  refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#16a34a"/>
+          </marker>
+        </defs>
+
+      </svg>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 2 — Endpoint Summary
+       ═══════════════════════════════════════════ -->
+  <section>
+    <h2>Endpoint Inventory</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Method</th><th>Path</th><th>Owner</th><th>Role</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="pill post">POST</span></td>
+          <td><code>/appointments/book</code></td>
+          <td>AppointmentController</td>
+          <td>Booking form submit → triggers notification automatically after commit</td>
+        </tr>
+        <tr>
+          <td><span class="pill post">POST</span></td>
+          <td><code>/api/notify</code></td>
+          <td>NotificationApiController</td>
+          <td><strong>Main-app endpoint</strong> — accepts <code>{ "appointmentId": N }</code>, fetches appointment, calls mock</td>
+        </tr>
+        <tr>
+          <td><span class="pill post ext">POST</span></td>
+          <td><code>/api/external/notifications</code></td>
+          <td>MockNotificationController</td>
+          <td><strong>External service stub</strong> — receives full NotificationRequest, returns NotificationResponse</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 3 — Payload Schemas
+       ═══════════════════════════════════════════ -->
+  <section>
+    <h2>Coarse-Grained Payload Schemas</h2>
+    <div class="two-col">
+
+      <div>
+        <h3>Request — NotificationRequest (JSON)</h3>
+        <pre><span class="cmt">// POST /api/external/notifications</span>
+{
+  <span class="key">"type"</span>    : <span class="str">"BOOKING_CONFIRMATION"</span>,
+  <span class="key">"channel"</span> : <span class="str">"EMAIL"</span>,
+  <span class="key">"recipient"</span> : {
+    <span class="key">"name"</span>  : <span class="str">"Jane Doe"</span>,
+    <span class="key">"email"</span> : <span class="str">"jane@example.com"</span>,
+    <span class="key">"phone"</span> : <span class="kw">null</span>
+  },
+  <span class="key">"appointment"</span> : {
+    <span class="key">"appointmentId"</span> : <span class="str">7</span>,
+    <span class="key">"startTime"</span>     : <span class="str">"2026-04-25T10:00:00"</span>,
+    <span class="key">"endTime"</span>       : <span class="str">"2026-04-25T11:00:00"</span>,
+    <span class="key">"totalPrice"</span>    : <span class="str">75.00</span>,
+    <span class="key">"notes"</span>         : <span class="str">"Gel manicure"</span>
+  }
+}</pre>
+      </div>
+
+      <div>
+        <h3>Response — NotificationResponse (JSON)</h3>
+        <pre><span class="cmt">// 200 OK from /api/external/notifications</span>
+{
+  <span class="key">"status"</span>         : <span class="str">"DELIVERED"</span>,
+  <span class="key">"notificationId"</span> : <span class="str">"A3F9D12B"</span>,
+  <span class="key">"message"</span> : <span class="str">"Confirmation sent via EMAIL
+             to jane@example.com"</span>,
+  <span class="key">"processedAt"</span> : <span class="str">"2026-04-22T14:05:33"</span>
+}
+
+
+
+
+</pre>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 4 — Coarse-Grained Design Justification
+       ═══════════════════════════════════════════ -->
+  <section>
+    <h2>Coarse-Grained API Design — Justification</h2>
+
+    <div class="two-col" style="margin-bottom:1.5rem;">
+      <div class="card good">
+        <h3>✓ Our Design (Coarse-Grained)</h3>
+        <ul>
+          <li><strong>1 HTTP call</strong> carries everything the external service needs</li>
+          <li>Recipient info, appointment detail, and notification type bundled in one payload</li>
+          <li>External service is self-sufficient — never queries back into our database</li>
+          <li>Failure of the notification service does not roll back the booking transaction</li>
+          <li>Clear ownership: Appointment Scheduler owns booking; Notification Service owns delivery</li>
+        </ul>
+      </div>
+
+      <div class="card bad">
+        <h3>✗ Fine-Grained Alternative (Rejected)</h3>
+        <ul>
+          <li><code>POST /notif/jobs</code> → create job, get jobId</li>
+          <li><code>PUT /notif/jobs/{id}/recipient</code> → set who receives it</li>
+          <li><code>PUT /notif/jobs/{id}/template</code> → choose template</li>
+          <li><code>POST /notif/jobs/{id}/send</code> → actually send</li>
+          <li><code>GET /notif/jobs/{id}/status</code> → poll for result</li>
+          <li>5× more round-trips; tight coupling to internal state machine of the external service</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card info">
+      <h3>Design Principles Applied</h3>
+      <ul>
+        <li><strong>Low coupling across the boundary:</strong> The Appointment Scheduler does not know (or care) whether the Notification Service uses SendGrid, Twilio, or a log file. It calls one endpoint and receives a status.</li>
+        <li><strong>High cohesion within each service:</strong> The Notification Service owns all delivery logic internally. The Scheduler owns all booking logic internally. Neither reaches into the other's data store.</li>
+        <li><strong>Fail-safe boundary:</strong> The <code>NotificationClient</code> catches all exceptions and logs them as WARN. A notification failure never propagates back to cancel a completed booking.</li>
+        <li><strong>Idempotent-friendly:</strong> The caller can retry the single POST if it times out, without risk of partial state on the external side.</li>
+        <li><strong>Evolvability:</strong> Adding SMS, push, or WhatsApp delivery in the future requires only a change to <code>channel</code> in the payload — no new endpoints needed on the Scheduler side.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 5 — Responsibility Boundary Summary
+       ═══════════════════════════════════════════ -->
+  <section>
+    <h2>Responsibility Boundary</h2>
+    <table>
+      <thead>
+        <tr><th>Concern</th><th>Owner</th><th>Rationale</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Slot locking &amp; double-booking prevention</td>
+          <td>AppointmentService (SERIALIZABLE transaction)</td>
+          <td>Must stay atomic with the DB write; cannot be delegated</td>
+        </tr>
+        <tr>
+          <td>Booking persistence</td>
+          <td>AppointmentRepository</td>
+          <td>Internal data concern; external service has no write access</td>
+        </tr>
+        <tr>
+          <td>Assembling the notification payload</td>
+          <td>NotificationService + NotificationClient</td>
+          <td>Translates internal Appointment model to the external contract</td>
+        </tr>
+        <tr>
+          <td>Choosing delivery channel &amp; template</td>
+          <td>MockNotificationController (external)</td>
+          <td>Delivery detail is the external service's concern — hidden from Scheduler</td>
+        </tr>
+        <tr>
+          <td>Generating a notification tracking ID</td>
+          <td>MockNotificationController (external)</td>
+          <td>Owned by the service that performs the delivery</td>
+        </tr>
+        <tr>
+          <td>Retry &amp; failure isolation</td>
+          <td>NotificationClient (catch block)</td>
+          <td>Network errors must not propagate into the booking transaction</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+</main>
+</body>
+</html>
